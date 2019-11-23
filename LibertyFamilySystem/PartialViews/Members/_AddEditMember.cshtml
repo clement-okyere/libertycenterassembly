@@ -1,0 +1,172 @@
+﻿@using LibertyFamilySystem.Models
+@model Member
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@section Styles
+    {
+    <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
+    <link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/css/loader.css" rel="stylesheet">
+
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="@(ViewBag.status == "add" ? "_AddMember" : "_UpdateMember")" asp-controller="Administration" data-ajax="true" data-ajax-method="POST" data-ajax-begin="ShowLoader" data-ajax-complete="HideLoader" data-ajax-success="ShowReport">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group" style="display:none;">
+                <label for="MemberId">ID</label>
+                <input type="text" asp-for="MemberId" class="form-control" id="MemberId" name="MemberId" value="@Model.MemberId" aria-describedby="emailHelp" placeholder="MemberId">
+                <span asp-validation-for="MemberId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="UserName">First Name</label>
+                <input type="text" class="form-control" id="FirstName" name="FirstName" value="@Model.FirstName" aria-describedby="emailHelp" placeholder="First Name" required>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="UserName">Middle Name</label>
+                <input type="text" class="form-control" id="MiddleName" name="MiddleName" value="@Model.MiddleName" aria-describedby="emailHelp" placeholder="Middle Name" required>
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="UserName">Last Name</label>
+                <input type="text" class="form-control" id="LastName" name="LastName" value="@Model.LastName" aria-describedby="emailHelp" placeholder="Last Name" required>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number</label>
+                <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" aria-describedby="emailHelp" placeholder="PhoneNumber" required>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label for="WhatsAppNumber">WhatsApp Number</label>
+                <input type="text" class="form-control" id="WhatsAppNumber" name="WhatsAppNumber" value="@Model.WhatsAppNumber" aria-describedby="emailHelp" placeholder="WhatsAppNumber">
+                <span asp-validation-for="WhatsAppNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="GroupID">Group</label>
+                <select type="text" class="formControl2 form-control col-md-8" asp-for="GroupId" asp-items="@Model.GroupSel" id="GroupId" placeholder="" required><option value="">-Select Group-</option></select>
+                <span asp-validation-for="GroupId" class="text-GroupId"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="OccupationId">Occupation</label>
+                <select type="text" class="formControl2 form-control col-md-8" asp-for="OccupationId" asp-items="@Model.OccupationSel" id="OccupationId" placeholder="" required><option value="">-Select Occupation-</option></select>
+                <span asp-validation-for="OccupationId" class="text-GroupId"></span>
+            </div>
+
+
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        IsGroupAdmin
+                        <input id="IsActive" asp-for="IsGroupAdmin" />
+                    </label>
+                </div>
+            </div>
+
+            @if (ViewBag.status == "add")
+            {
+                <div class="form-group">
+                    <input type="submit" id="saveUser" value="Add" class="btn btn-info" />
+                </div>
+            }
+            else if (ViewBag.status == "update")
+            {
+                <div class="form-group">
+                    <input type="submit" id="updateUser" value="Update" class="btn btn-info" />
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/lib/Microsoft.jQuery.Unobtrusive.Ajax/jquery.unobtrusive-ajax.js"></script>
+<script>
+        //show response from server after adding organization
+            
+            function ShowReport(response) {
+
+                var status;
+                var title;
+
+                if (response.key) {
+                    status = "success"
+                    title = "Success"
+                } else {
+                    status = "error"
+                    title = "Failed"
+                }
+
+                if (response.key) {
+                    //alert(response.value)
+                   swal({
+                title: title,
+                text: response.value,
+                html: true,
+                type: status,
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "OK",
+                closeOnConfirm: true
+                    }, function () { if (status == "success") { window.location.href = "@Url.Action("GetMembers", "Administration")" } });
+
+                }
+                else {
+                  //alert(response.value);
+                  swal({
+                title: title,
+                text: response.value,
+                html: true,
+                type: status,
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "OK",
+                closeOnConfirm: true
+               });
+
+                }
+
+               var status;
+            var title;
+
+            if (response.key) {
+                status = "success"
+                title = "Success"
+            } else {
+                status = "error"
+                title = "Failed"
+            }
+
+            var a = document.getElementById("loader");
+
+            a.style.display = "none";
+
+            }
+            //end show response
+
+            //show loader
+            function ShowLoader() {
+                $("#loader").css("display", "block");
+            }
+
+
+            //Hide loader
+            function HideLoader() {
+                $("#loader").css("display", "none");
+            }
+</script>
+
+

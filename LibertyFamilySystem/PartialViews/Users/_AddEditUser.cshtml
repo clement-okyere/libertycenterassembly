@@ -1,0 +1,90 @@
+﻿@using LibertyFamilySystem.ViewModels
+@model UserViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@section Styles
+    {
+    <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
+    <link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/css/loader.css" rel="stylesheet">
+
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="@(ViewBag.status == "add" ? "_AddUser" : "UpdateUser")" asp-controller="Administrator" data-ajax="true" data-ajax-method="POST" data-ajax-success="ShowReport">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @if (ViewBag.status == "add")
+            {
+                <div class="form-group">
+                    <label for="UserName">Username</label>
+                    <input type="text" class="form-control" id="Username" name="Username" value="@Model.Username" aria-describedby="emailHelp" placeholder="Username" required>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label for="UserName">Username</label>
+                    <input type="text" class="form-control" id="Username" name="Username" value="@Model.Username" aria-describedby="emailHelp" placeholder="Username" required disabled>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number</label>
+                <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" aria-describedby="emailHelp" placeholder="PhoneNumber" required>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            @*<div class="form-group">
+            <label for="Roles">Roles</label>
+            <select asp-for="PersonRoleID" id="PersonRoleID" class="select2 m-b-10 select2-multiple" style="width: 100%" multiple="multiple" data-placeholder="Choose Role" asp-items="Model.RoleSel"></select>
+            <span asp-validation-for="Roles" class="text-danger"></span>
+        </div>*@
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="IsActive" name="IsActive" checked>
+                <label class="form-check-label" for="IsActive">IsActive</label>
+            </div>
+
+            @if (ViewBag.status == "add")
+            {
+                <div class="form-group">
+                    <input type="submit" id="saveUser" value="Add" class="btn btn-info" />
+                </div>
+            }
+            else if (ViewBag.status == "update")
+            {
+                <div class="form-group">
+                    <input type="submit" id="updateUser" value="Update" class="btn btn-info" />
+                </div>
+            }
+        </form>
+    </div>
+</div>
+@section Scripts {
+
+    @*<script>
+        var status = '@(ViewBag.status)';
+        if (status == "update") {
+
+        var Roles = @Html.Raw(Json.Serialize(ViewData["Roles"]));
+        $(".select2").val(Roles);
+        console.log(Roles);
+        }
+
+        //make comb box accept multiple
+        $(".select2").select2();
+        var Roles = $(".select2").val();
+        var noelem = [];
+
+        $(".select2").change(function () {
+
+        var selected = $(this).val();
+        console.log(selected);
+
+        });
+        </script>*@
+}
+
+

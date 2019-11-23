@@ -1,0 +1,170 @@
+﻿@using LibertyFamilySystem.ViewModels
+@model IEnumerable<AttendanceViewModel>
+
+
+@{
+    ViewData["Title"] = "Get Attendance Sheet";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string Event = ViewBag.ActiveEvent;
+}
+
+@section Styles
+    {
+    <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
+    <link href="~/lib/toast-master/css/jquery.toast.css" rel="stylesheet">
+
+    <link href="~/css/loader.css" rel="stylesheet">
+}
+
+@if (!string.IsNullOrWhiteSpace(Event))
+{
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Attendance Sheet</h1>
+    <p class="mb-4" style="font-weight:bold;font-size:20px;">Mark Attendance for @Event</p>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="attendanceTable" class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>FullName</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>FullName</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var attendance in Model)
+                        {
+                            <tr>
+                                <td style="font-weight:bold;">@attendance.FullName</td>
+                                <td><button id="@attendance.MemberId" class="btn btn-danger markAttendance" data-RegId="@attendance.MemberId" role="button">Mark</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <h1 class="h3 mb-2 text-gray-800">Attendance Sheet</h1>
+    <p class="mb-4" style="font-weight:bold;font-size:20px;">There are no active Events today</p>
+
+}
+
+
+@section Scripts{
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+    <script src="~/lib/toast-master/js/jquery.toast.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#attendanceTable').DataTable();
+
+            $("#attendanceTable").on("click", ".update", function () {
+                $(".modal-title").text("Update Member");
+                var memberId = $(this).attr("id");
+                $("#AddMemberBody").load("/Administration/_AddEditMember?status=update&memberId=" + memberId);
+                $("#AddMemberModal").modal("toggle");
+            });
+
+
+            //show loader
+            function ShowLoader() {
+                $("#loader").css("display", "block");
+            }
+
+
+            //Hide loader
+            function HideLoader() {
+                $("#loader").css("display", "none");
+            }
+
+
+            $(".markAttendance").click(function (e) {
+                e.preventDefault();
+                var memberId = $(this).attr("id");
+                var $t = $(this);
+                //Ajax call starts here
+                $.ajax({
+                    type: "POST",
+                    url: `/Administration/MarkAttendance?memberId=${memberId}`,
+                    traditional: true,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+
+                    beforeSend: function () {
+                        $("#loader").css("display", "block");
+                    },
+                    complete: function () {
+                        $("#loader").css("display", "none");
+                    },
+                    error: function (xhr) {
+                        $("#loader").css("display", "none");
+                        $.toast({
+                            heading: '<b>ERROR</b>',
+                            text: 'Oops....something went wrong.....try again',
+                            position: 'top-right',
+                            bgColor: '',
+                            textColor: 'white',
+                            stack: false,
+                            icon: 'error',
+                            hideAfter: false,
+                            showHideTransition: 'plain'
+                        });
+                        alert("Oooops! something happened!!");
+                    },
+                    success: function (response) {
+                        var status;
+                        var title;
+
+                        if (response.key) {
+                            status = "success"
+                            title = "Success"
+                        } else {
+                            status = "error"
+                            title = "Failed"
+                        }
+
+                        var message = "";
+                        if (response.value == "mark") {
+                            $t.removeClass("btn-danger").addClass("btn-success");
+                            message = "Marked Successfully";
+                        }
+                        else if (response.value == "unmark") {
+                            $t.removeClass("btn-success").addClass("btn-danger");
+                            message = "unMarked Successfully";
+                        }
+
+
+                        $.toast({
+                            heading: status,
+                            text: message,
+                            position: 'top-right',
+                            bgColor: '',
+                            textColor: 'white',
+                            stack: false,
+                            icon: 'info',
+                            hideAfter: false,
+                            showHideTransition: 'plain'
+                        });
+                    }
+                });
+            });
+
+        });
+
+    </script>
+}
+
+
+

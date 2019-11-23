@@ -1,0 +1,281 @@
+﻿@using LibertyFamilySystem.ViewModels
+@model IEnumerable<UserViewModel>
+
+@{
+    ViewData["Title"] = "CreateUser";
+}
+
+@section Styles
+    {
+    <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
+
+    <link href="~/css/loader.css" rel="stylesheet">
+}
+
+
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Users</h1>
+<p class="mb-4">Liberty Family Group System Users</p>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <button type="button" id="AddUser" class="btn btn-primary float-right">Add User</button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="userTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>UserName</th>
+                        <th>Role</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>UserName</th>
+                        <th>Role</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.Username</td>
+                            <td>@user.Role</td>
+                            <td> <button id="@user.Username" class="btn btn-warning update" data-RegId="@user.Username" role="button">Edit</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!--Table Ends here-->
+<!--Add User Modal begins here-->
+<div class="modal fade" id="AddUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="AddUserBody" class="modal-body">
+                ...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Add User Modal Ends here-->
+
+@section Scripts{
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#userTable').DataTable();
+
+
+            $("#AddUser").click(function () {
+
+                $(".modal-title").text("Add User");
+                $("#AddUserBody").load("/Administration/_AddEditUser?status=add");
+                $("#AddUserModal").modal("toggle");
+            });
+
+            $("#userTable").on("click", ".update", function () {
+                $(".modal-title").text("Update User");
+                var username = $(this).attr("id");
+                console.log(username);
+                $("#AddUserBody").load("/Administration/_AddEditUser?status=update&username=" + username);
+                $("#AddUserModal").modal("toggle");
+            });
+
+            $(document).on("click", "#saveUser", function (e) {
+                e.preventDefault();
+                var username = $("#Username").val();
+                var phoneNumber = $("#PhoneNumber").val();
+
+                if (!username || !phoneNumber) {
+                    swal({
+                        title: "",
+                        text: "Fill all required fields",
+                        type: "error"
+                    });
+                    return;
+                }
+
+
+                var user = {
+                    Username: $("#Username").val(),
+                    PhoneNumber: $("#PhoneNumber").val(),
+                    IsActive: ($('#IsActive').is(":checked")) ? true : false
+                };
+
+                //Ajax call starts here
+                $.ajax({
+                    type: "POST",
+                    url: "/Administration/_AddUser",
+                    traditional: true,
+
+                    data: JSON.stringify(user),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+
+                    beforeSend: function () {
+                        $("#loader").css("display", "block");
+                    },
+                    complete: function () {
+                        $("#loader").css("display", "none");
+                    },
+                    error: function (xhr) {
+                        $("#loader").css("display", "none");
+                        $.toast({
+                            heading: '<b>ERROR</b>',
+                            text: 'Oops....something went wrong.....try again',
+                            position: 'top-right',
+                            bgColor: '',
+                            textColor: 'white',
+                            stack: false,
+                            icon: 'error',
+                            hideAfter: false,
+                            showHideTransition: 'plain'
+                        });
+                        alert("Oooops! something happened!!");
+                    },
+                    success: function (response) {
+                        var status;
+                        var title;
+
+                        if (response.key) {
+                            status = "success"
+                            title = "Success"
+                        } else {
+                            status = "error"
+                            title = "Failed"
+                        }
+
+                        swal({
+                            title: title,
+                            text: response.value,
+                            html: true,
+                            type: status,
+                            showCancelButton: false,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: true
+                        }, function () {
+                            if (status == "success") {
+                                window.location.href = "/Administration/CreateUser";
+                            }
+                        });
+                    },
+                });
+
+                //Ajax call ends here
+            });
+
+             $("#userTable").on("click", ".update", function () {
+                $(".modal-title").text("Update User");
+                var username = $(this).attr("id");
+                console.log(username);
+                $("#AddUserBody").load("/Administration/_AddEditUser?status=update&username=" + username);
+                $("#AddUserModal").modal("toggle");
+            });
+
+            $(document).on("click", "#updateUser", function (e) {
+                e.preventDefault();
+                var username = $("#Username").val();
+                var phoneNumber = $("#PhoneNumber").val();
+
+                if (!username || !phoneNumber) {
+                    swal({
+                        title: "",
+                        text: "Fill all required fields",
+                        type: "error"
+                    });
+                    return;
+                }
+
+
+                var user = {
+                    Username: $("#Username").val(),
+                    PhoneNumber: $("#PhoneNumber").val(),
+                    IsActive: ($('#IsActive').is(":checked")) ? true : false
+                };
+
+                //Ajax call starts here
+                $.ajax({
+                    type: "POST",
+                    url: "/Administration/_UpdateUser",
+                    traditional: true,
+
+                    data: JSON.stringify(user),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+
+                    beforeSend: function () {
+                        $("#loader").css("display", "block");
+                    },
+                    complete: function () {
+                        $("#loader").css("display", "none");
+                    },
+                    error: function (xhr) {
+                        $("#loader").css("display", "none");
+                        $.toast({
+                            heading: '<b>ERROR</b>',
+                            text: 'Oops....something went wrong.....try again',
+                            position: 'top-right',
+                            bgColor: '',
+                            textColor: 'white',
+                            stack: false,
+                            icon: 'error',
+                            hideAfter: false,
+                            showHideTransition: 'plain'
+                        });
+                        alert("Oooops! something happened!!");
+                    },
+                    success: function (response) {
+                        var status;
+                        var title;
+
+                        if (response.key) {
+                            status = "success"
+                            title = "Success"
+                        } else {
+                            status = "error"
+                            title = "Failed"
+                        }
+
+                        swal({
+                            title: title,
+                            text: response.value,
+                            html: true,
+                            type: status,
+                            showCancelButton: false,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: true
+                        }, function () {
+                            if (status == "success") {
+                                window.location.href = "/Administration/CreateUser";
+                            }
+                        });
+                    },
+                });
+
+                //Ajax call ends here
+
+            });
+
+        });
+
+    </script>
+}
+
