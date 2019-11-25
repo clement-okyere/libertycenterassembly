@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Abp.HangFire.AspNetCore" Version="2.2.1" />
     <PackageReference Include="Dapper" Version="2.0.30" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.4.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
@@ -17,6 +19,10 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
     <Folder Include="PartialViews\Members\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".circleci\config.yml" />
   </ItemGroup>
 
 </Project>

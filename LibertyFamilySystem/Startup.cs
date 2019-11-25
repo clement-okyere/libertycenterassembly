@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using LibertyFamilySystem.Services;
 using LibertyFamilySystem.Repositories;
 using LibertyFamilySystem.Models.Options;
+using Hangfire;
+using Hangfire.PostgreSql;
+using LibertyFamilySystem.HangFire;
 
 namespace LibertyFamilySystem
 {
@@ -66,6 +69,8 @@ namespace LibertyFamilySystem
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IDashboardRepository, DashboardRepository>();
             services.AddScoped<IGroupRepository, GroupRepository>();
+            services.AddScoped<IEventJob, EventJob>();
+            services.AddHangfire(x => x.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
@@ -112,6 +117,14 @@ namespace LibertyFamilySystem
             app.UseAuthentication();
 
             app.UseSession();
+            app.UseHangfireDashboard();
+            app.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = 1
+            });
+
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+            HangFireJobScheduler.ScheduleRecurringJobs();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

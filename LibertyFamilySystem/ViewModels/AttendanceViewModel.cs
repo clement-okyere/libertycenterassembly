@@ -7,7 +7,7 @@ namespace LibertyFamilySystem.ViewModels
 {
     public class AttendanceViewModel
     {
-        public int EventId { get; set; }
+        public int? EventId { get; set; }
         public int MemberId { get; set; }
         public string FullName { get; set; }
     }

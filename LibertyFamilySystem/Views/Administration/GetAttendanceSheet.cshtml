@@ -44,10 +44,17 @@
                     <tbody>
                         @foreach (var attendance in Model)
                         {
-                            <tr>
-                                <td style="font-weight:bold;">@attendance.FullName</td>
+                        <tr>
+                            <td style="font-weight:bold;">@attendance.FullName</td>
+                            @if (attendance.EventId == null)
+                            {
                                 <td><button id="@attendance.MemberId" class="btn btn-danger markAttendance" data-RegId="@attendance.MemberId" role="button">Mark</button></td>
-                            </tr>
+                            }
+                            else
+                            {
+                                <td><button id="@attendance.MemberId" class="btn btn-danger markAttendance" data-RegId="@attendance.MemberId" role="button">Mark</button></td>
+                            }
+                        </tr>
                         }
                     </tbody>
                 </table>
