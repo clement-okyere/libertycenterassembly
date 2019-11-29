@@ -1,30 +1,28 @@
 version: 2.1
 
-orbs:
-  win: circleci/windows@1.0.0
-
 jobs:
   build:
-    executor:
-      name: win/vs2019
-      shell: powershell.exe
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
       - run:
-          name: "Install project dependencies"
-          command: dotnet.exe restore
-      - save_cache:
-          paths:
-            - C:\Users\circleci\.nuget\packages
-          key: dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
+          name: Restore Packages
+          command:
+            dotnet restore
+          working_directory: LibertyFamilySystem
       - run:
-          name: "Run Build step"
-          command: dotnet.exe publish -c Release -r win10-x64
+          name: Build
+          command: dotnet build -c Release
+          working_directory: LibertyFamilySystem
       - run:
-          name: "Test the executable"
-          command: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
-      - store_artifacts:
-          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
+          name: Running Tests
+          command: dotnet test
+          working_directory: LibertyFamilySystem.Test
+      - run:
+          name: "Build and push Docker image"
+          command: |
+            docker build -t LibertyFamilySystem .
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker tag boku herocod3r/MyProject
+            docker push herocod3r/MyProject
